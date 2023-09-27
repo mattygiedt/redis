@@ -1,0 +1,45 @@
+namespace com.mattygiedt.flatbuffer.marketdata;
+
+enum Source:uint8 {
+    BPIPE,
+    TRACE,
+    CP_PLUS,
+    IHSM,
+    CEP,
+    ICEBP,
+    TMC,
+    TWD
+}
+
+struct Price {
+    value:double;
+}
+
+struct Quantity {
+    value:double;
+}
+
+struct EpochNanos {
+    value:int64;
+}
+
+table MarketDataSnapshot {
+    instrument_id:uint32;
+    source:Source;
+    create_tm:EpochNanos;
+    bid_price:Price;
+    bid_yield:Price;
+    bid_spread:Price;
+    bid_gspread:Price;
+    ask_price:Price;
+    ask_yield:Price;
+    ask_spread:Price;
+    ask_gspread:Price;
+    bid_size:Quantity;
+    ask_size:Quantity;
+    last_trade_size:Quantity;
+    last_trade_price:Price;
+    last_trade_tm:EpochNanos;
+}
+
+root_type MarketDataSnapshot;
