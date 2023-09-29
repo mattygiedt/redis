@@ -38,7 +38,7 @@ public class ServiceEntry {
 
     boolean doMarketData = false;
     boolean doPubSub = false;
-    boolean doStreams = true;
+    boolean doStreams = false;
 
     //
     //  Where is our redis-server running?
