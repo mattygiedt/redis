@@ -1,6 +1,7 @@
 namespace com.mattygiedt.flatbuffer.marketdata;
 
 enum Source:uint8 {
+    UNKNOWN,
     BPIPE,
     TRACE,
     CP_PLUS,
