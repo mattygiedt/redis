@@ -17,12 +17,57 @@ Once built, re-open VSCode Project in Container.
 I like to use two terminals inside my editor for managing the redis server and the java applications.
 
 ### Start the redis server
-This is simply the default configuration from the `redis-7.2.1` release, no changes.
+In the `redis-server` terminal execute `redis-server` passing in the local configuration, or some other config file of your choosing. The local config is the default configuration from the `redis-7.2.1` release, no changes.
 ```
 root@132a95213ae8:/workspaces/redis# redis-server config/redis.conf
+1203:C 29 Sep 2023 18:14:51.266 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1203:C 29 Sep 2023 18:14:51.266 * Redis version=7.2.1, bits=64, commit=00000000, modified=0, pid=1203, just started
+1203:C 29 Sep 2023 18:14:51.266 * Configuration loaded
+1203:M 29 Sep 2023 18:14:51.267 * monotonic clock: POSIX clock_gettime
+                _._
+           _.-``__ ''-._
+      _.-``    `.  `_.  ''-._           Redis 7.2.1 (00000000/0) 64 bit
+  .-`` .-```.  ```\/    _.,_ ''-._
+ (    '      ,       .-`  | `,    )     Running in standalone mode
+ |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6379
+ |    `-._   `._    /     _.-'    |     PID: 1203
+  `-._    `-._  `-./  _.-'    _.-'
+ |`-._`-._    `-.__.-'    _.-'_.-'|
+ |    `-._`-._        _.-'_.-'    |           https://redis.io
+  `-._    `-._`-.__.-'_.-'    _.-'
+ |`-._`-._    `-.__.-'    _.-'_.-'|
+ |    `-._`-._        _.-'_.-'    |
+  `-._    `-._`-.__.-'_.-'    _.-'
+      `-._    `-.__.-'    _.-'
+          `-._        _.-'
+              `-.__.-'
+
 ```
 
-### Build the java source and run
+### Build the java source
+```
+root@132a95213ae8:/workspaces/redis# mvn clean package
+[INFO] Scanning for projects...
+
+...
+
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO]
+[INFO] redis-parent 1.0.0 ................................. SUCCESS [  0.165 s]
+[INFO] redis-src 1.0.0 .................................... SUCCESS [  0.003 s]
+[INFO] redis-flatbuffer 0.0.1-SNAPSHOT .................... SUCCESS [  2.009 s]
+[INFO] redis-java 0.0.1-SNAPSHOT .......................... SUCCESS [  1.230 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.524 s
+[INFO] Finished at: 2023-09-29T18:11:18Z
+[INFO] ------------------------------------------------------------------------
+root@132a95213ae8:/workspaces/redis#
+```
+
+### Run the compiled Java
 ```
 root@132a95213ae8:/workspaces/redis# java -jar src/java/target/redis-java-0.0.1-SNAPSHOT-shaded.jar
 18:03:31.764 [main] INFO com.mattygiedt.redis.ServiceEntry -- redis-server: localhost:6379
