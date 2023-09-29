@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.StreamEntryID;
 import redis.clients.jedis.params.XReadParams;
 import redis.clients.jedis.resps.StreamEntry;
+import redis.clients.jedis.resps.StreamInfo;
 
 //
 //  https://redis.io/docs/data-types/streams/
@@ -41,5 +42,9 @@ public class StreamsClient {
 
   public List<Map.Entry<String, List<StreamEntry>>> tail(final Map<String, StreamEntryID> streams) {
     return redisClient.xread(XReadParams.xReadParams().block(0), streams);
+  }
+
+  public StreamInfo info(final String key) {
+    return redisClient.xinfoStream(key);
   }
 }
