@@ -38,7 +38,7 @@ public class ServiceEntry {
 
     boolean doMarketData = false;
     boolean doPubSub = false;
-    boolean doStreams = false;
+    boolean doStreams = true;
 
     //
     //  Where is our redis-server running?
@@ -256,9 +256,15 @@ public class ServiceEntry {
 
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
       try {
-        logger.warn("Shutdown ...");
         running.set(false);
+
+        logger.warn("Shutting down ...");
+        final List<String> getAllKeys = redisClient.getAllKeys("*");
+        logger.warn(" redis-server key_count: {}", getAllKeys.size());
+        logger.warn(" redis-server keys: {}", getAllKeys);
+
         executor.shutdown();
+        redisClient.close();
       } catch (Exception ex) {
         logger.error("Shutdown error:", ex);
       }

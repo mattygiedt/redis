@@ -1,7 +1,10 @@
 package com.mattygiedt.redis;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +14,10 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.StreamEntryID;
+import redis.clients.jedis.params.ScanParams;
 import redis.clients.jedis.params.XAddParams;
 import redis.clients.jedis.params.XReadParams;
+import redis.clients.jedis.resps.ScanResult;
 import redis.clients.jedis.resps.StreamEntry;
 import redis.clients.jedis.resps.StreamFullInfo;
 import redis.clients.jedis.resps.StreamInfo;
@@ -21,6 +26,7 @@ public final class RedisClient {
   private static final Logger logger = LoggerFactory.getLogger(RedisClient.class);
   public static final XAddParams DEFAULT_XADD_PARAMS = XAddParams.xAddParams();
   public static final int XRANGE_COUNT = 1024 * 8;
+  public static final int REDIS_SCAN_COUNT = 1024 * 8;
 
   private static class JedisPoolProvider {
     private final ConcurrentHashMap<HostAndPort, JedisPool> poolMap = new ConcurrentHashMap<>();
@@ -49,7 +55,7 @@ public final class RedisClient {
     public static final JedisPoolProvider PROVIDER = new JedisPoolProvider();
   }
 
-  public static JedisPool getJedisPool(final HostAndPort hostAndPort) {
+  private static JedisPool getJedisPool(final HostAndPort hostAndPort) {
     return SingletonHolder.PROVIDER.getOrCreatePool(hostAndPort);
   }
 
@@ -61,6 +67,10 @@ public final class RedisClient {
 
   public RedisClient(final HostAndPort hostAndPort) {
     this.jedisPool = RedisClient.getJedisPool(hostAndPort);
+  }
+
+  public void close() {
+    jedisPool.close();
   }
 
   ////////////////////////////////////////////////////////////////////
@@ -292,5 +302,43 @@ public final class RedisClient {
     }
 
     return null;
+  }
+
+  ////////////////////////////////////////////////////////////////////
+  //  scan
+  //
+  //    Sample patterns: (case sensitive!)
+  //
+  //      '*' -- return all keys
+  //      'trade*' -- return all keys that start with 'trade'
+  //      'LQD' -- match exactly
+  //
+
+  public List<String> getAllKeys(final String pattern) {
+    try (Jedis jedis = jedisPool.getResource()) {
+      return new ArrayList<>(getAllKeys(pattern, ScanParams.SCAN_POINTER_START, jedis));
+    } catch (Exception ex) {
+      logger.error("Error occurred While scanning keys with the following pattern : {}", pattern);
+    }
+
+    return null;
+  }
+
+  private Set<String> getAllKeys(final String pattern, final String cursor, final Jedis jedis) {
+    final Set<String> keysSet = new HashSet<>();
+    // Scan params used to construct arguments to the scan command
+    final ScanParams scanParams = new ScanParams().count(REDIS_SCAN_COUNT).match(pattern);
+
+    // fetch the result (keys returned) from the scanResult and add it to the
+    // list of existing keys
+    final ScanResult<String> scanResult = jedis.scan(cursor, scanParams);
+    keysSet.addAll(scanResult.getResult());
+
+    // If the cursor returned by the scan result is not START(0) then
+    // recursively call the function with returned cursor and aggregate the results
+    if (!ScanParams.SCAN_POINTER_START.equals(scanResult.getCursor())) {
+      keysSet.addAll(getAllKeys(pattern, scanResult.getCursor(), jedis));
+    }
+    return keysSet;
   }
 }

@@ -24,10 +24,11 @@ root@132a95213ae8:/workspaces/redis# redis-server config/redis.conf
 
 ### Build the java source and run
 ```
-root@132a95213ae8:/workspaces/redis# mvn clean package
 root@132a95213ae8:/workspaces/redis# java -jar src/java/target/redis-java-0.0.1-SNAPSHOT-shaded.jar
-14:55:40.354 [main] INFO com.mattygiedt.redis.ServiceEntry -- redis-server: localhost:6379
-14:55:40.564 [Thread-0] WARN com.mattygiedt.redis.ServiceEntry -- Shutdown ...
+18:03:31.764 [main] INFO com.mattygiedt.redis.ServiceEntry -- redis-server: localhost:6379
+18:03:31.966 [Thread-0] WARN com.mattygiedt.redis.ServiceEntry -- Shutting down ...
+18:03:31.968 [Thread-0] WARN com.mattygiedt.redis.ServiceEntry --  redis-server key_count: 0
+18:03:31.968 [Thread-0] WARN com.mattygiedt.redis.ServiceEntry --  redis-server keys: []
 root@132a95213ae8:/workspaces/redis#
 ```
 Your `java` terminal should look like the above, and validates that you can connect to the redis-server. You'll get a `java.net.ConnectException: Connection refused` exception if you can't.
@@ -83,5 +84,7 @@ root@132a95213ae8:/workspaces/redis# java -jar src/java/target/redis-java-0.0.1-
 15:04:59.179 [pool-1-thread-1] INFO com.mattygiedt.redis.ServiceEntry -- generated trade event: 1695999899179-0
 15:04:59.182 [main] INFO com.mattygiedt.redis.ServiceEntry -- tail returned: channel trades:LQD, entry: [1695999899179-0 {SYMBOL=LQD, PRICE=2.046712154E9, QUANTITY=-51782725}]
 ^C
-15:05:05.221 [Thread-0] WARN com.mattygiedt.redis.ServiceEntry -- Shutdown ...
+15:05:34.494 [Thread-0] WARN com.mattygiedt.redis.ServiceEntry -- Shutting down ...
+15:05:34.499 [Thread-0] WARN com.mattygiedt.redis.ServiceEntry --  redis-server key_count: 2
+15:05:34.499 [Thread-0] WARN com.mattygiedt.redis.ServiceEntry --  redis-server keys: [trades:TLT, trades:LQD]
 ```
