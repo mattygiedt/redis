@@ -5,7 +5,7 @@ A simple exploration into a few of the APIs supported by Redis. Redis is an open
 * [Streams](https://redis.io/docs/data-types/streams/)
 
 ## Dev Environment
-I use VSCode + Docker and these instructions basically how I setup my development environment.
+I use VSCode + Docker and these instructions follow the steps I use to setup my development environment.
 
 ### Build the `redis-env:local` container image
 Start in the project root and type:
